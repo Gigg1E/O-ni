@@ -5,6 +5,8 @@
 ![Discord.py](https://img.shields.io/badge/discord.py-2.3.2-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 
+* This is push one. Not all mentioned features or functions will be included and or 100% working. Any issues you see or features to add, post in issues. Thank you. *
+
 O-ni is a customizable anime-themed AI assistant built for Discord. She blends personality and utility, combining traditional Discord bot features with local LLM integration, server tools, and immersive responses.
 
 > **"O-ni is not just a bot... she's your server’s virtual companion."**
