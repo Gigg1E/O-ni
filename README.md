@@ -5,7 +5,7 @@
 ![Discord.py](https://img.shields.io/badge/discord.py-2.3.2-blue)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 
-* This is push one. Not all mentioned features or functions will be included and or 100% working. Any issues you see or features to add, post in issues. Thank you. *
+* This is push one. Not all mentioned features or functions will be included and or 100% working. Any issues you see or features to add, post in issues and/or pull. Thank you. *
 
 O-ni is a customizable anime-themed AI assistant built for Discord. She blends personality and utility, combining traditional Discord bot features with local LLM integration, server tools, and immersive responses.
 
@@ -16,12 +16,13 @@ O-ni is a customizable anime-themed AI assistant built for Discord. She blends p
 ## ✨ Features
 
 - 💬 **Personality Chat** - Converses with users using a local LLM (via [Ollama](https://ollama.com)).
-- ⚙️ **Admin Tools** - Ban, warn, and manage users through rich moderation commands.
-- 📂 **Session Memory** - Remembers conversations across sessions (optional).
-- 🛠️ **Tasks & Automation** - Execute structured tasks through `$run`, `$task`, etc.
-- 🎭 **Impersonation Tools** - Perform actions *as another user* for fun or testing.
-- 📈 **Logs & Analytics** - Tracks interactions, sessions, and server data.
+- ⚙️ **Admin Tools** - Ban, warn, and manage users through rich moderation commands. (inactive/Connected to $run/$task)
+- 📂 **Session Memory** - Remembers conversations across sessions.
+- 🛠️ **Tasks & Automation** - Execute structured tasks through `$run`, `$task`, etc. (inactive)
+- 🎭 **Impersonation Tools** - Perform actions *as another user* for fun or testing. (inactive)
+- 📈 **Logs & Analytics** - Tracks interactions, sessions, and server data. (Logs only really work in terminal while bot is active)
 - 🌗 **Themed Responses** - Custom responses styled for both dark and light Discord themes.
+- 🛡️ **Command Protection** - Only admins will know what '$' copmmands can be used (unless you run $help in a @everyone channel... Don't). '/' commands users can see.
 
 ---
 
@@ -32,19 +33,27 @@ O-ni/
 ├── bot.py                   # Main entry point
 ├── cogs/                    # Bot feature modules
 │   ├── admin.py
-│   ├── chat.py
-│   ├── tasks/
-│   │   └── impersonate_task.py
+│   ├── ai.py
+|   ├── channel_control.py
+|   ├── guild_setup.py
+|   ├── misc.py
+|   ├── session.py
+|   ├── start_up.py
+│   ├── tasks/			  # Comming Soon
+│   │   └── impersonate_task.py # More to add
 ├── core/                    # Core logic (LLM, session manager)
 │   ├── llm_client.py
-│   ├── session_manager.py
+│   ├── session_manager.py 
 ├── utils/                   # Utility helpers and config
 │   ├── config_loader.py
+|   ├── guild_db.py
+|   ├── permissions.py	  # Not used and will be removed soon
 ├── data/
 │   ├── servers/             # Per-server config/logs
 │   ├── sessions.db          # SQLite database for session tracking
 │   └── logs/
-├── config.json              # Main bot config
+├── config/ 
+|   ├──  config.json              # Main bot config
 ├── requirements.txt
 └── README.md
 ````
@@ -53,16 +62,16 @@ O-ni/
 
 ## ⚙️ Configuration
 
-Create a `config.json` in the root directory:
+Edit the `config.json` in the config/ directory:
 
 ```json
 {
   "default_model": "llama3:latest",
   "max_response_length": 1999,
-  "default_system_prompt": "You are O-ni, a helpful, smart, and cute anime girl AI assistant.",
+  "default_system_prompt": "default prompt here",
   "max_sessions_per_user": 5,
   "session_db_path": "data/sessions.db",
-  "temp_session_file": "data/temp",
+  "temp_session_file": "data/temp.json",
   "bfl_root": "data/servers",
   "logs_root": "data/logs"
 }
@@ -85,12 +94,22 @@ cd O-ni
 pip install -r requirements.txt
 ```
 
+### 2.5. Install ollama and download models
+
+1. Visit [Ollama](https://ollama.com/download) to dowload the API
+
+2. Pull a model you want to use
+```bash
+ollama pull llama3:latest
+```
+
+
 ### 3. Set Up Discord Bot Token
 
 Create a `.env` file or use `os.environ` in `bot.py`:
 
 ```
-DISCORD_TOKEN=your_bot_token_here
+DISCORD_TOKEN=YOUR_TOKEN
 ```
 
 ### 4. Run the Bot
@@ -98,6 +117,7 @@ DISCORD_TOKEN=your_bot_token_here
 ```bash
 python -m bot
 ```
+> This is all included in run_bot.bat
 
 ---
 
@@ -106,10 +126,11 @@ python -m bot
 | Command     | Description                              |
 | ----------- | ---------------------------------------- |
 | `$help`     | Show all available commands              |
+| `$info`     | Shows basic content about O-ni           |
 | `$talk`     | Talk to O-ni (personality chat with LLM) |
-| `$run`      | Run a task like impersonation            |
-| `$ban`      | Admin-only: ban a user                   |
-| `$warn`     | Admin-only: warn a user                  |
+| `$run`      | Run a task like impersonation (inactive) |
+| `$ban`      | Admin-only: ban a user        (inactive) |
+| `$warn`     | Admin-only: warn a user       (inactive) |
 | `$shutdown` | Admin-only: gracefully shut down the bot |
 
 ---
@@ -130,7 +151,7 @@ ollama run llama3
 
 * All admin commands are protected using Discord role checks.
 * Session memory is stored per-user and per-guild (with limits).
-* Impersonation requires privileged access to avoid abuse.
+* Impersonation requires privileged access to avoid abuse. (inactive)
 
 ---
 
@@ -154,7 +175,7 @@ This project is licensed under the MIT License.
 
 ## 🎀 Credits
 
-* Developed by [MqllpW](https://github.com/your-profile)
+* Developed by [MqllpW](https://github.com/Gigg1E)
 * Powered by `discord.py`, `Ollama`, and a passion for anime and AI.
 
 ---
