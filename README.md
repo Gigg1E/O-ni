@@ -50,7 +50,7 @@ O-ni/
 |   ├── permissions.py	  # Not used and will be removed soon
 ├── data/
 │   ├── servers/             # Per-server config/logs
-│   ├── sessions.db          # SQLite database for session tracking
+│   		├── sessions.db          # SQLite database for session tracking
 │   └── logs/
 ├── config/ 
 |   ├──  config.json              # Main bot config
@@ -70,7 +70,7 @@ Edit the `config.json` in the config/ directory:
   "max_response_length": 1999,
   "default_system_prompt": "default prompt here",
   "max_sessions_per_user": 5,
-  "session_db_path": "data/sessions.db",
+  "session_db_path": "data/servers/sessions.db",
   "temp_session_file": "data/temp.json",
   "bfl_root": "data/servers",
   "logs_root": "data/logs"
@@ -125,12 +125,12 @@ python -m bot
 
 | Command     | Description                              |
 | ----------- | ---------------------------------------- |
-| `$help`     | Show all available commands              |
-| `$info`     | Shows basic content about O-ni           |
-| `$talk`     | Talk to O-ni (personality chat with LLM) |
+| `/help`     | Show all available commands              |
+| `/info`     | Shows basic content about O-ni           |
+| `/talk`     | Talk to O-ni (personality chat with LLM) |
 | `$run`      | Run a task like impersonation (inactive) |
 | `$ban`      | Admin-only: ban a user        (inactive) |
-| `$warn`     | Admin-only: warn a user       (inactive) |
+| `$listdbsessions`| Admin-only: See database sessions   |
 | `$shutdown` | Admin-only: gracefully shut down the bot |
 
 ---
