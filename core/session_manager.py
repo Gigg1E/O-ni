@@ -122,7 +122,51 @@ class SessionManager:
             logger.error(f"[ERROR] Failed to update session '{session_name}' for user {user_id} in guild {guild_id}: {e}", exc_info=True)
             return False
 
+    def export_user_session(self, user_id: int, session_name: str) -> dict:
+        conn = sqlite3.connect(self.db_path)
+        c = conn.cursor()
+        c.execute("SELECT messages FROM sessions WHERE user_id = ? AND session_name = ?", (user_id, session_name))
+        row = c.fetchone()
+        conn.close()
 
+        if not row:
+            return None
+
+        try:
+            content = json.loads(row[0])
+        except json.JSONDecodeError:
+            content = {"content": row[0]}
+
+        return content
+
+    def export_all_sessions(self) -> dict:
+        conn = sqlite3.connect(self.db_path)
+        c = conn.cursor()
+        c.execute("SELECT guild_id, user_id, session_name, messages FROM sessions")
+        rows = c.fetchall()
+        conn.close()
+
+        export_data = {}
+        for guild_id, user_id, session_name, content in rows:
+            export_data.setdefault(str(guild_id), {}).setdefault(str(user_id), {})[session_name] = content
+        return export_data
+
+
+    def get_all_sessions_for_user(self, user_id: int) -> List[str]:
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT session_name FROM sessions WHERE user_id = ?", (user_id,))
+            rows = cursor.fetchall()
+            conn.close()
+
+            session_names = [row[0] for row in rows]
+            logger.debug(f"[SessionManager] Found {len(session_names)} sessions for user {user_id}")
+            return session_names
+
+        except Exception as e:
+            logger.error(f"[SessionManager] Failed to fetch sessions for user {user_id}: {e}")
+            return []
 
 
     def list_sessions(self, guild_id: str, user_id: str) -> List[str]:

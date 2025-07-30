@@ -36,6 +36,7 @@ O-ni/
 │   ├── ai.py
 |   ├── channel_control.py
 |   ├── guild_setup.py
+|   ├── export.py
 |   ├── misc.py
 |   ├── session.py
 |   ├── start_up.py
@@ -50,7 +51,7 @@ O-ni/
 |   ├── permissions.py	  # Not used and will be removed soon
 ├── data/
 │   ├── servers/             # Per-server config/logs
-│   		├── sessions.db          # SQLite database for session tracking
+│   |   ├── sessions.db          # SQLite database for session tracking
 │   └── logs/
 ├── config/ 
 |   ├──  config.json              # Main bot config
@@ -125,12 +126,12 @@ python -m bot
 
 | Command     | Description                              |
 | ----------- | ---------------------------------------- |
-| `/help`     | Show all available commands              |
-| `/info`     | Shows basic content about O-ni           |
-| `/talk`     | Talk to O-ni (personality chat with LLM) |
+| `$help`     | Show all available commands              |
+| `$info`     | Shows basic content about O-ni           |
+| `$talk`     | Talk to O-ni (personality chat with LLM) |
 | `$run`      | Run a task like impersonation (inactive) |
 | `$ban`      | Admin-only: ban a user        (inactive) |
-| `$listdbsessions`| Admin-only: See database sessions   |
+| `$warn`     | Admin-only: warn a user       (inactive) |
 | `$shutdown` | Admin-only: gracefully shut down the bot |
 
 ---
@@ -183,11 +184,16 @@ This project is licensed under the MIT License.
 ## 🔮 Future Roadmap
 
 * [ ] Voice input support
-* [ ] Web dashboard for configuration
 * [ ] Per-server fine-tuning
 * [ ] Reaction-based prompts
 * [ ] Auto-response triggers
 
 ---
+
+## ✨ New to this version
+
+* Added export options for users and admins
+* Fixed some logging, more to fix still
+
 
 *Thank you for using O-ni. She’s always listening... and always learning.* 🍡

@@ -40,6 +40,7 @@ class Misc(commands.Cog):
         embed.add_field(name="/savesession", value="💾 Save your current session.", inline=False)
         embed.add_field(name="/deletesession", value="🗑️ Delete a saved session.", inline=False)
         embed.add_field(name="/clearsession", value="🧹 Clear all messages in the current session.", inline=False)
+        embed.add_field(name="/export", value="📦 Export your session to a file.", inline=False)
 
         # ─── Server & Misc ───
         embed.add_field(name="‎", value="━━━━━━━━━━━━━━━━", inline=False)
@@ -201,6 +202,6 @@ class Misc(commands.Cog):
         await ctx.send(embed=embed)
 
 async def setup(bot):
-    logger.debug("[HelpSlash] Loading cog...")
+    logger.debug("[DEBUG] Loading HelpSlashCog...")
     await bot.add_cog(Misc(bot))
-    logger.info("[HelpSlash] Loaded successfully.")
+    logger.info("[AI] HelpSlashCog Loaded successfully.")

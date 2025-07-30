@@ -178,6 +178,6 @@ class SessionCog(commands.Cog):
             await interaction.followup.send("⚠️ Failed to switch session.", ephemeral=True)
 
 async def setup(bot):
-    logger.debug("[SessionCog] Loading cog...")
+    logger.debug("[DEBUG] Loading SessionCog...")
     await bot.add_cog(SessionCog(bot))
-    logger.info("[SessionCog] Loaded successfully.")
+    logger.info("[AI] Loaded SessionCog successfully.")

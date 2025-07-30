@@ -4,7 +4,11 @@ import discord
 from discord.ext import commands
 from utils.config_loader import load_config
 from core.session_manager import SessionManager
+import zipfile
+import tempfile
 import logging
+import shutil
+from datetime import datetime
 import os
 import json
 import sqlite3
@@ -121,7 +125,7 @@ class AdminCog(commands.Cog):
     async def list_db_sessions(self, ctx):
         """Admin command to list all sessions stored in the database."""
         logger.info(f"[COMMAND] listdbsessions invoked by {ctx.author} ({ctx.author.id})")
-        await ctx.send("Command received, processing...")
+        await ctx.send("Command received, processing...", ephemeral=True)
         if not os.path.exists(self.db_path):
             await ctx.send("❌ No session database found.")
             return
@@ -151,6 +155,61 @@ class AdminCog(commands.Cog):
         except Exception as e:
             logger.exception("[DB ERROR] Failed to query session DB")
             await ctx.send(f"❌ Error occurred: `{e}`")
+
+    @commands.command(name="export")
+    @commands.has_permissions(administrator=True)
+    async def export_command(self, ctx, subcommand: str = None):
+        if subcommand == "all":
+            await self.export_all(ctx)
+        else:
+            await ctx.send("❓ Usage: `$export all`")
+
+    async def export_all(self, ctx):
+        await ctx.send("⏳ Exporting all sessions, please wait...")
+
+        data = self.sessions.export_all_sessions()
+
+        # Create temp folder
+        temp_dir = tempfile.mkdtemp()
+        export_folder = os.path.join(temp_dir, "EXPORTFOLDER")
+        os.makedirs(export_folder, exist_ok=True)
+
+        for guild_id, users in data.items():
+            for user_id, sessions in users.items():
+                user_dir = os.path.join(export_folder, str(guild_id), str(user_id))
+                os.makedirs(user_dir, exist_ok=True)
+                for session_name, session_data in sessions.items():
+                    try:
+                        file_path = os.path.join(user_dir, f"{session_name}.json")
+                        with open(file_path, "w") as f:
+                            json.dump(session_data, f, indent=4)
+                    except Exception as e:
+                        print(f"⚠️ Failed to write session '{session_name}': {e}")
+
+        # Create zip
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        zip_filename = f"export_{timestamp}.zip"
+        zip_path = os.path.join(temp_dir, zip_filename)
+        shutil.make_archive(zip_path.replace(".zip", ""), 'zip', export_folder)
+
+        # Send result
+        try:
+            await ctx.send(
+                "✅ Export complete.",
+                file=discord.File(zip_path, filename=zip_filename)
+            )
+        except discord.HTTPException:
+            try:
+                await ctx.author.send(
+                    "⚠️ File too large to send in the channel. Here's your export via DM:",
+                    file=discord.File(zip_path, filename=zip_filename)
+                )
+            except discord.HTTPException:
+                await ctx.send("❌ Could not send file. It's likely too large for Discord.")
+
+        # Clean up
+        shutil.rmtree(temp_dir)
+
 
 
 async def setup(bot):
