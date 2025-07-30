@@ -51,7 +51,7 @@ O-ni/
 |   ├── permissions.py	  # Not used and will be removed soon
 ├── data/
 │   ├── servers/             # Per-server config/logs
-│   |   ├── sessions.db          # SQLite database for session tracking
+│   |    └──sessions.db          # SQLite database for session tracking
 │   └── logs/
 ├── config/ 
 |   ├──  config.json              # Main bot config
@@ -126,12 +126,12 @@ python -m bot
 
 | Command     | Description                              |
 | ----------- | ---------------------------------------- |
-| `$help`     | Show all available commands              |
-| `$info`     | Shows basic content about O-ni           |
-| `$talk`     | Talk to O-ni (personality chat with LLM) |
+| `/help`     | Show all available commands              |
+| `/info`     | Shows basic content about O-ni           |
+| `/talk`     | Talk to O-ni (personality chat with LLM) |
 | `$run`      | Run a task like impersonation (inactive) |
-| `$ban`      | Admin-only: ban a user        (inactive) |
-| `$warn`     | Admin-only: warn a user       (inactive) |
+| `$export all`| Admin-only: Create a export file of all chats|
+| `$listdbsessions`| Admin-only:Shows all user sessions |
 | `$shutdown` | Admin-only: gracefully shut down the bot |
 
 ---
