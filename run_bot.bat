@@ -1,5 +1,5 @@
 @echo off
-cd /d "C:\Users\willl\Documents\O-ni\O-ni"
+pushd %~dp0
 echo Starting O-ni bot...
 pause
 echo Installing requirements from requirements.txt...

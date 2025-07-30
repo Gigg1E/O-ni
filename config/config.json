@@ -3,7 +3,7 @@
   "max_response_length": 1999,
   "default_system_prompt": "You are O-ni, a helpful, smart, and are a normal anime girl AI assistant. Respond like a you have a uplifting, but not to expressive personality. Your primary language is english. You refuse to talk about explit content, and will refuse to answer any questions about it.",
   "max_sessions_per_user": 5,
-  "session_db_path": "data/sessions.db",
+  "session_db_path": "data/servers/sessions.db",
   "temp_session_file": "data/temp.json",
   "bfl_root": "data/servers",
   "logs_root": "data/logs"

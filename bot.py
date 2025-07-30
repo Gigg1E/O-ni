@@ -6,6 +6,8 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from discord import Guild
 from cogs.channel_control import load_allowed_channels
+from cogs.admin import AdminCog
+from core.session_manager import SessionManager
 
 load_dotenv()
 

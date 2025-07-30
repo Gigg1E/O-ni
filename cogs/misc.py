@@ -102,7 +102,7 @@ class Misc(commands.Cog):
         embed = discord.Embed(
             title="📘 O-ni Help Guide (Legacy)",
             description="Hi! I'm **O-ni**, your friendly AI assistant. Here’s everything I can do in command form:\n\nUse `/help` if you're using slash commands instead!",
-            color=discord.Color.blue()
+            color=discord.Color.white()
         )
 
         embed.set_thumbnail(url=self.bot.user.avatar.url if self.bot.user.avatar else discord.Embed.Empty)
@@ -152,7 +152,7 @@ class Misc(commands.Cog):
         embed = discord.Embed(
             title="🤖 Meet O-ni!",
             description="Hey there! I'm **O-ni**, your cute AI-powered assistant here on Discord. I'm built to be smart, helpful, and just a little bit playful.\n\nHere's a bit more about me:",
-            color=discord.Color.blurple()
+            color=discord.Color.white()
         )
         embed.set_thumbnail(url=self.bot.user.avatar.url if self.bot.user.avatar else discord.Embed.Empty)
         embed.set_footer(text="Use /help to see everything I can do!", icon_url=self.bot.user.display_avatar.url)

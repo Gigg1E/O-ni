@@ -7,6 +7,7 @@ from core.session_manager import SessionManager
 import logging
 import os
 import json
+import sqlite3
 
 config = load_config()
 
@@ -20,6 +21,10 @@ if not logger.hasHandlers():
     ch.setFormatter(formatter)
     logger.addHandler(ch)
 
+
+session_manager = SessionManager("data/servers/sessions.db")
+max_sessions=config["max_sessions_per_user"]
+
 def is_owner(ctx):
     is_owner = ctx.author.id == ctx.guild.owner_id or ctx.author.guild_permissions.administrator
     logger.debug(f"[USER] Permission check for user {ctx.author.id} on guild {ctx.guild.id}: is_owner={is_owner}")
@@ -29,14 +34,11 @@ class AdminCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         logger.debug("[DEBUG] Initializing AdminCog")
-       
 
-        self.sessions = SessionManager(
-            db_path=os.path.join(config["bfl_root"], "sessions.db"),
-            max_sessions=config["max_sessions_per_user"]
-        )
+        self.sessions = session_manager
+        self.db_path = self.sessions.db_path
 
-        logger.debug(f"[DEBUG] SessionManager initialized with data_root={config['bfl_root']}")
+        logger.debug(f"[DEBUG] SessionManager initialized with db_path={self.db_path} / max_sessions={max_sessions} / session_manager={self.sessions}")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
@@ -112,6 +114,44 @@ class AdminCog(commands.Cog):
         except Exception as e:
             logger.error(f"[ERROR] Error reloading cogs: {e}", exc_info=True)
             await ctx.send("⚠️ Failed to reload cogs!")
+
+
+    @commands.command(name="listdbsessions")
+    @commands.has_permissions(administrator=True)
+    async def list_db_sessions(self, ctx):
+        """Admin command to list all sessions stored in the database."""
+        logger.info(f"[COMMAND] listdbsessions invoked by {ctx.author} ({ctx.author.id})")
+        await ctx.send("Command received, processing...")
+        if not os.path.exists(self.db_path):
+            await ctx.send("❌ No session database found.")
+            return
+
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            cursor.execute("SELECT guild_id, user_id, session_name FROM sessions")
+            rows = cursor.fetchall()
+            conn.close()
+
+            logger.debug(f"[DB] Retrieved {len(rows)} rows from session DB")
+
+            if not rows:
+                await ctx.send("📁 No sessions found in the database.")
+                return
+
+            output = []
+            for row in rows:
+                g, u, s = row
+                output.append(f"Guild: `{g}` | User: `{u}` | Session: `{s}`")
+
+            chunks = [output[i:i+10] for i in range(0, len(output), 10)]
+            for chunk in chunks:
+                await ctx.send("\n".join(chunk))
+
+        except Exception as e:
+            logger.exception("[DB ERROR] Failed to query session DB")
+            await ctx.send(f"❌ Error occurred: `{e}`")
+
 
 async def setup(bot):
     logger.debug("[DEBUG] Loading AdminCog cog...")

@@ -126,8 +126,8 @@ class ChannelControl(commands.Cog):
         await ctx.send("✅ Allowed channels:\n" + "\n".join(mentions))
 
     # '/' commands for list server support
-    @app_commands.command(name="listallowed", description="📄 List allowed channels in this server.")
-    async def listallowed(self, interaction: discord.Interaction):
+    @app_commands.command(name="listallowedchannels", description="📄 List allowed channels in this server.")
+    async def listallowedchannels(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=True)
         guild_id = str(interaction.guild.id)
         user_id = str(interaction.user.id)

@@ -47,24 +47,6 @@ class SessionManager:
     def _get_db_connection(self):
         return sqlite3.connect(self.db_path)
 
-    def _save_session_to_db(self, guild_id: str, user_id: str, session_name: str, messages: List[Dict[str, str]]):
-        conn = self._get_db_connection()
-        cursor = conn.cursor()
-        try:
-            messages_json = json.dumps(messages)
-            cursor.execute("""
-                INSERT OR REPLACE INTO sessions (guild_id, user_id, session_name, messages)
-                VALUES (?, ?, ?, ?);
-            """, (str(guild_id), str(user_id), session_name, messages_json))
-            conn.commit()
-            logger.info(f"[AI] Saved/Updated session '{session_name}' for user {user_id} in guild {guild_id} to DB")
-            return True
-        except sqlite3.Error as e:
-            logger.error(f"[ERROR] Failed to save session '{session_name}' to DB: {e}", exc_info=True)
-            return False
-        finally:
-            conn.close()
-
     def _load_session_from_db(self, guild_id: str, user_id: str, session_name: str) -> List[Dict[str, str]] | None:
         conn = self._get_db_connection()
         cursor = conn.cursor()
@@ -88,36 +70,23 @@ class SessionManager:
         finally:
             conn.close()
 
-    def save_session_to_db(self, guild_id: str, user_id: str, session_name: str) -> bool:
-        """
-        Save a specific in-memory session for the given user in a guild to db.
-        Only this one session is affected.
-        """
-        guild_id = str(guild_id)
-        user_id = str(user_id)
-
+    def _save_session_to_db(self, guild_id: str, user_id: str, session_name: str, messages: List[Dict[str, str]]):
+        conn = self._get_db_connection()
+        cursor = conn.cursor()
         try:
-            session_data = (
-                self.temp_sessions
-                .get(guild_id, {})
-                .get(user_id, {})
-                .get(session_name)
-            )
-
-            if not session_data:
-                logger.warning(f"[WARN] No session data to save for '{session_name}' (user {user_id}, guild {guild_id})")
-                return False
-
-            if not isinstance(session_data, list) or not all('role' in m and 'content' in m for m in session_data):
-                logger.error(f"[ERROR] Malformed session structure for '{session_name}' (user {user_id}, guild {guild_id})")
-                return False
-
-            return self._save_session_to_db(guild_id, user_id, session_name, session_data)
-
-        except Exception as e:
-            logger.exception(f"[ERROR] Unexpected failure during save_session_to_db: {e}")
+            messages_json = json.dumps(messages)
+            cursor.execute("""
+                INSERT OR REPLACE INTO sessions (guild_id, user_id, session_name, messages)
+                VALUES (?, ?, ?, ?);
+            """, (str(guild_id), str(user_id), session_name, messages_json))
+            conn.commit()
+            logger.info(f"[AI] Saved/Updated session '{session_name}' for user {user_id} in guild {guild_id} to DB")
+            return True
+        except sqlite3.Error as e:
+            logger.error(f"[ERROR] Failed to save session '{session_name}' to DB: {e}", exc_info=True)
             return False
-
+        finally:
+            conn.close()
 
     def _store_temp(self, guild_id: str, user_id: str, session_name: str, messages: List[Dict[str, str]]):
         self.temp_sessions.setdefault(str(guild_id), {}).setdefault(str(user_id), {})[session_name] = messages
@@ -137,12 +106,24 @@ class SessionManager:
                 return []
 
     def update_session(self, guild_id: str, user_id: str, session_name: str, messages: List[Dict[str, str]]):
-        if not isinstance(messages, list) or not all('role' in m and 'content' in m for m in messages):
-            logger.warning(f"[WARN] Attempted to update session '{session_name}' with invalid messages structure for user {user_id}.")
-            return
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT OR REPLACE INTO sessions
+                    (guild_id, user_id, session_name, messages)
+                    VALUES (?, ?, ?, ?);
+                """, (str(guild_id), str(user_id), session_name, json.dumps(messages)))
+                conn.commit()
+            self._store_temp(guild_id, user_id, session_name, messages)
+            logger.info(f"[AI] Updated session '{session_name}' for user {user_id} in guild {guild_id}")
+            return True
+        except sqlite3.Error as e:
+            logger.error(f"[ERROR] Failed to update session '{session_name}' for user {user_id} in guild {guild_id}: {e}", exc_info=True)
+            return False
 
-        self._store_temp(guild_id, user_id, session_name, messages)
-        self._save_session_to_db(guild_id, user_id, session_name, messages)
+
+
 
     def list_sessions(self, guild_id: str, user_id: str) -> List[str]:
         conn = self._get_db_connection()

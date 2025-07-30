@@ -80,27 +80,6 @@ class SessionCog(commands.Cog):
     def set_session_name(self, guild_id: int, user_id: int, name: str):
         self.active_session.setdefault(str(guild_id), {})[str(user_id)] = name
         logger.debug(f"[DEBUG] Set session for user {user_id} in guild {guild_id} to: {name}")
-
-
-    @app_commands.command(name="savesession", description="💾 Save your current session to history.")
-    async def savesession(self, interaction: discord.Interaction):
-        await interaction.response.defer(thinking=True)
-        guild_id = str(interaction.guild.id)
-        user_id = str(interaction.user.id)
-        name = self.get_session_name(guild_id, user_id)
-
-        session_data = self.sessions.get_current_session(guild_id, user_id, name)
-        try:
-            if session_data:
-                if self.sessions.save_session_to_disk(guild_id, user_id, session_data):
-                    await interaction.followup.send(f"✅ Session `{name}` saved to history.")
-                else:
-                    await interaction.followup.send(f"⚠ Failed to save session `{name}`.", ephemeral=True)
-            else:
-                await interaction.followup.send(f"⚠ Nothing to save for session `{name}`.", ephemeral=True)
-        except Exception as e:
-            logger.error(f"[ERROR] Could not save session '{name}': {e}", exc_info=True)
-            await interaction.followup.send(f"⚠ Failed to save session `{name}` due to an error.", ephemeral=True)
     
     @app_commands.command(name="listsession", description="📂 list all saved session.")
     async def listsession(self, interaction: discord.Interaction):
